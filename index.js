@@ -5,6 +5,7 @@ import { HttpCookieAgent, HttpsCookieAgent } from 'http-cookie-agent';
 import cheerio from 'cheerio'
 import fs from 'fs'
 import client from 'webdriverio'
+import * as telegraf from 'telegraf' 
 
 const jar = new CookieJar();
 
@@ -14,36 +15,108 @@ const httpsAgent = new HttpsCookieAgent({ jar });
 var $, checkoutCode
 var paymentURL, paymentToken
 
-// await fetch("https://shop.smartone.com/en/storefront/mobile/iPhone-13/3358/?addtocart=1", {
-//     "credentials": "include",
-//     "headers": {
-//         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:100.0) Gecko/20100101 Firefox/100.0",
-//         "Accept": "text/javascript, text/html, application/xml, text/xml, */*",
-//         "Accept-Language": "en-GB,en;q=0.5",
-//         "X-Requested-With": "XMLHttpRequest",
-//         "X-Prototype-Version": "1.7.2",
-//         "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-//         "Sec-Fetch-Dest": "empty",
-//         "Sec-Fetch-Mode": "cors",
-//         "Sec-Fetch-Site": "same-origin"
-//     },
-//     "referrer": "https://shop.smartone.com/en/storefront/mobile/iPhone-13/3358/",
-//     "body": "url=%3Faddtocart%3D1&product_id=3358&product_type=handset&color=(PRODUCT)RED&size=256GB",
-//     "method": "POST",
-//     "mode": "cors",
-//     agent: ({ protocol }) => {
-//         return protocol === 'https:' ? httpsAgent : httpAgent;
-//       },
-// })
-// .then(async PhoneResp => {
-//     return await PhoneResp.json()
-// })
-// .then(async done1 => {
-//     console.log(done1)
-// })
-// .catch(async err => {
-//     console.log(err)
-// })
+// 2061661977:AAEuxmTJ4IPye-th3Qi-7sBWerZEzI4WsHE
+const MyTGApp = new telegraf.Telegraf('2061661977:AAEuxmTJ4IPye-th3Qi-7sBWerZEzI4WsHE') 
+
+var proMax = [
+    {
+        "Color": "Sierra Blue",
+        "GB": "model128GB",
+    },
+    {
+        "Color": "Sierra Blue",
+        "GB": "model256GB",
+    },
+    {
+        "Color": "Sierra Blue",
+        "GB": "model512GB",
+    },
+    {
+        "Color": "Sierra Blue",
+        "GB": "model1TB",
+    },
+    {
+        "Color": "Silver",
+        "GB": "model128GB",
+    },
+    {
+        "Color": "Silver",
+        "GB": "model256GB",
+    },
+    {
+        "Color": "Silver",
+        "GB": "model512GB",
+    },
+    {
+        "Color": "Silver",
+        "GB": "model1TB",
+    },
+    {
+        "Color": "Gold",
+        "GB": "model128GB",
+    },
+    {
+        "Color": "Gold",
+        "GB": "model256GB",
+    },
+    {
+        "Color": "Gold",
+        "GB": "model512GB",
+    },
+    {
+        "Color": "Gold",
+        "GB": "model1TB",
+    },
+    {
+        "Color": "Graphite",
+        "GB": "model128GB",
+    },
+    {
+        "Color": "Graphite",
+        "GB": "model256GB",
+    },
+    {
+        "Color": "Graphite",
+        "GB": "model512GB",
+    },
+    {
+        "Color": "Graphite",
+        "GB": "model1TB",
+    }
+]
+var TGChatIds = []
+
+var TGMessageIds = []
+
+var pushChatId = async (id) => { 
+    if(TGChatIds.indexOf(id) < 0){ 
+        TGChatIds.push(id) 
+    }  
+} 
+
+MyTGApp.hears('check', (ctx) => ctx.reply('The App is Running!')) 
+MyTGApp.start(async (ctx) => { 
+
+    ctx.reply(`Welcome to use Tony BBG Telegram Bot`) 
+
+    // console.log(ctx.chat.id) 
+
+    ctx.reply(`Your Chat Id is : ${ctx.chat.id}`) 
+
+    var messageId = await ctx.reply(`This chat will be used to update the IPhone availability`) 
+
+    TGMessageIds.push(messageId.message_id) 
+
+    await pushChatId(ctx.chat.id) 
+
+}) 
+
+MyTGApp.help((ctx) => { 
+
+    ctx.reply(`To make sure you know how to use the App\nType /help to see it`) 
+
+}) 
+MyTGApp.launch() 
 
 // await fetch("https://shop.smartone.com/en/storefront/mobile/iPhone-13/3358/?addtocart=1", {
 //     "credentials": "include",
@@ -272,7 +345,7 @@ var paymentURL, paymentToken
 //     console.log(err)
 // })
 
-var newTesting = async(url) => {
+var newTesting = async(url,color,gb) => {
     const timeOutSeconds = 30
     var humanClick = async(element)=>{
         var evt = document.createEvent("MouseEvents");
@@ -368,11 +441,15 @@ var newTesting = async(url) => {
 
     
 
-    // await abortEle(/.+.css/)
-    // await abortEle(/.+.woff/)
-    // await abortEle(/.+.svg/)
-    // await abortEle(/.+.jpg/)
-    // await abortEle(/.+.png/)
+    await abortEle(/.+.css/)
+    await abortEle(/.+.woff/)
+    await abortEle(/.+.svg/)
+    await abortEle(/.+.jpg/)
+    await abortEle(/.+.png/)
+
+    setTimeout(async() => {
+        await browser.deleteSession()
+    }, 1800000)
 
     // mock1.respond()
     var btn
@@ -380,22 +457,33 @@ var newTesting = async(url) => {
     var testingWaitTime = 0
     
     await browser.url(url)
-    btn = await browser.$$('a.color-swatch[title="(PRODUCT)RED"]')[0]
+    btn = await browser.$$(`a.color-swatch[title="${color}`)[0]
     // .filter(x => x.title == 'Blue')
     // Promise.all([await checkElementExists(btn)])
     await browser.execute(humanClick, btn)
-    btn = await browser.$('#model512GB')
+    btn = await browser.$(`#model${gb.substr(5,gb.length - 5).toUpperCase()}`)
     await browser.execute(humanClick, btn)
+    await browser.pause(2000)
     btn = await browser.$$('.st-add-bag-btn.st-vert-top-50')[0]
     await btn.click()
     await browser.pause(7000)
     btn = await browser.$$('#cartPopList')[0]
     await browser.execute(humanClick, btn)
-    btn = await browser.$$('.button-checkout')[0]
-    await browser.execute(humanClick, btn)
+    try {
+        btn = await browser.$$('.button-checkout')[0]
+        await browser.execute(humanClick, btn)
+    } catch(err){
+        console.log(err)
+    }
+    
     await browser.pause(1000)
-    btn = await browser.$$('#tabarrow-tab-pickup')[0]
-    await browser.execute(humanClick, btn)
+    try {
+        btn = await browser.$$('#tabarrow-tab-pickup')[0]
+        await browser.execute(humanClick, btn)
+    } catch(err){
+        await browser.deleteSession()
+    }
+    
     // await browser.click()
     btn = await browser.$$('#shpIFC')[0]
     await browser.execute(humanClick, btn)
@@ -436,14 +524,75 @@ var newTesting = async(url) => {
     await browser.pause(5000)
     btn = await browser.$$('#cardNumber')[0]
     await btn.setValue('6244780011368107')
-    await browser.pause(5000)
-    btn = browser.$('#btnNext')
+    btn = await browser.$$('#btnNext')[0]
     await browser.execute(humanClick, btn)
+    btn = await browser.$$('#expireMonth')[0]
+    await btn.setValue('09')
+    btn = await browser.$$('#expireYear')[0]
+    await btn.setValue('26')
+    btn = await browser.$$('#cvn2')[0]
+    await btn.setValue('011')
+    btn = await browser.$$('#btnGetCode')[0]
     await browser.execute(humanClick, btn)
-    await btn.click()
 }
 
-newTesting('https://shop.smartone.com/en/storefront/mobile/iPhone-13/3358/')
+var checkPhoneAvail = async (color, gb) => {
+    await fetch("https://shop.smartone.com/en/storefront/mobile/iPhone-13/3358/?addtocart=1", {
+        "credentials": "include",
+        "headers": {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:100.0) Gecko/20100101 Firefox/100.0",
+            "Accept": "text/javascript, text/html, application/xml, text/xml, */*",
+            "Accept-Language": "en-GB,en;q=0.5",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-Prototype-Version": "1.7.2",
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-origin"
+        },
+        "referrer": "https://shop.smartone.com/en/storefront/mobile/iPhone-13/3358/",
+        "body": `url=%3Faddtocart%3D1&product_id=3358&product_type=handset&color=${color}&size=${gb.substr(5,gb.length - 5).toUpperCase()}`,
+        "method": "POST",
+        "mode": "cors",
+        agent: ({ protocol }) => {
+            return protocol === 'https:' ? httpsAgent : httpAgent;
+        },
+    })
+    .then(async PhoneResp => {
+        return await PhoneResp.json()
+    })
+    .then(async done1 => {
+        if(done1.status == "ok"){
+            console.log(`We are going to call the buy function of ok`)
+            await newTesting('https://shop.smartone.com/en/storefront/mobile/iPhone-13-Pro-Max/3360/', color, gb)
+            TGChatIds.forEach(async(ele,idx) => { 
+                MyTGApp.telegram.sendMessage(ele, `The Phone ${color} ${gb} has stock`)
+                MyTGApp.telegram.sendMessage(ele,'https://shop.smartone.com/en/storefront/mobile/iPhone-13-Pro-Max/3360/')
+            })
+            setTimeout(() => {
+                console.log(`we have successfully bought ${color} with ${gb}, wait for 1 Hour`)
+            },3600000)
+        }
+        
+    })
+    .catch(async err => {
+        console.log(err)
+    })
+}
+
+// newTesting('https://shop.smartone.com/en/storefront/mobile/iPhone-13-Pro-Max/3360/', 'Silver', 'model512gb')
+
+// proMax.forEach(async(val,idx)=>{
+//     // console.log(val)
+//     await checkPhoneAvail(val.Color, val.GB)
+// })
+
+setInterval(async () => {
+    proMax.forEach(async(val,idx)=>{
+        // console.log(val)
+        await checkPhoneAvail(val.Color, val.GB)
+    })
+}, 500)
 
 // await fetch(paymentURL, {
 //     "credentials": "include",
