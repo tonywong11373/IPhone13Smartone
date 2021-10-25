@@ -15,7 +15,6 @@ const httpsAgent = new HttpsCookieAgent({ jar });
 var $, checkoutCode
 var paymentURL, paymentToken
 
-// 2061661977:AAEuxmTJ4IPye-th3Qi-7sBWerZEzI4WsHE
 const MyTGApp = new telegraf.Telegraf('2061661977:AAEuxmTJ4IPye-th3Qi-7sBWerZEzI4WsHE') 
 
 var proMax = [
@@ -562,6 +561,7 @@ var checkPhoneAvail = async (color, gb) => {
         return await PhoneResp.json()
     })
     .then(async done1 => {
+        console.log(done1)
         if(done1.status == "ok"){
             console.log(`We are going to call the buy function of ok`)
             await newTesting('https://shop.smartone.com/en/storefront/mobile/iPhone-13-Pro-Max/3360/', color, gb)
@@ -592,7 +592,7 @@ setInterval(async () => {
         // console.log(val)
         await checkPhoneAvail(val.Color, val.GB)
     })
-}, 500)
+}, 8000)
 
 // await fetch(paymentURL, {
 //     "credentials": "include",
